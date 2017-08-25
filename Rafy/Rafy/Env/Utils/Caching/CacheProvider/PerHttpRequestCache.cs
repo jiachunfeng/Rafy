@@ -58,23 +58,23 @@ namespace Rafy.Utils.Caching
 
         protected internal override StoredValue GetCacheItemCore(string region, string key)
         {
-            if(string.IsNullOrWhiteSpace(key)) throw new ArgumentException($"parameter {nameof(key)} can not be null or empty.");
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentException($"parameter {nameof(key)} can not be null or empty.");
 
             var items = this.GetItems();
 
-            return (StoredValue) items?[key];
+            return (StoredValue)items?[key];
         }
 
         protected internal override bool AddCore(string region, string key, StoredValue value)
         {
-            if(string.IsNullOrWhiteSpace(key)) throw new ArgumentException($"parameter {nameof(key)} can not be null or empty.");
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentException($"parameter {nameof(key)} can not be null or empty.");
 
             var items = this.GetItems();
-            if(items == null) return false;
+            if (items == null) return false;
 
-            if(value == null) return false;
+            if (value == null) return false;
 
-            if(items.Contains(key))
+            if (items.Contains(key))
             {
                 items[key] = value;
             }
@@ -88,7 +88,7 @@ namespace Rafy.Utils.Caching
 
         protected internal override void RemoveCore(string region, string key)
         {
-            if(string.IsNullOrWhiteSpace(key)) throw new ArgumentException($"parameter {nameof(key)} can not be null or empty.");
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentException($"parameter {nameof(key)} can not be null or empty.");
 
             var items = this.GetItems();
 
@@ -97,10 +97,10 @@ namespace Rafy.Utils.Caching
 
         protected internal override void ClearRegionCore(string region)
         {
-            if(string.IsNullOrWhiteSpace(region)) throw new ArgumentException($"parameter {nameof(region)} can not be null or empty.");
+            if (string.IsNullOrWhiteSpace(region)) throw new ArgumentException($"parameter {nameof(region)} can not be null or empty.");
 
             var items = this.GetItems();
-            if(items == null)
+            if (items == null)
             {
                 return;
             }
@@ -108,15 +108,15 @@ namespace Rafy.Utils.Caching
             var enumerator = items.GetEnumerator();
             var regex = new Regex(region, RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.IgnoreCase);
             var keysToRemove = new List<string>();
-            while(enumerator.MoveNext())
+            while (enumerator.MoveNext())
             {
-                if(regex.IsMatch(enumerator.Key.ToString()))
+                if (regex.IsMatch(enumerator.Key.ToString()))
                 {
                     keysToRemove.Add(enumerator.Key.ToString());
                 }
             }
 
-            foreach(var key in keysToRemove)
+            foreach (var key in keysToRemove)
             {
                 items.Remove(key);
             }
@@ -125,19 +125,19 @@ namespace Rafy.Utils.Caching
         protected internal override void ClearCore()
         {
             var items = this.GetItems();
-            if(items == null)
+            if (items == null)
             {
                 return;
             }
 
             var enumerator = items.GetEnumerator();
             var keysToRemove = new List<string>();
-            while(enumerator.MoveNext())
+            while (enumerator.MoveNext())
             {
                 keysToRemove.Add(enumerator.Key.ToString());
             }
 
-            foreach(var key in keysToRemove)
+            foreach (var key in keysToRemove)
             {
                 items.Remove(key);
             }

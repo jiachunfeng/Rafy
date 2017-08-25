@@ -18,7 +18,7 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 
-namespace Rafy.Utils
+namespace Rafy.WPF
 {
     internal static class PathHelper
     {
@@ -30,9 +30,9 @@ namespace Rafy.Utils
         {
             AppDomain.CurrentDomain.SetData("PRIVATE_BINPATH", path);
             AppDomain.CurrentDomain.SetData("BINPATH_PROBE_ONLY", path);
-            var m = typeof(AppDomainSetup).GetMethod("UpdateContextProperty", BindingFlags.NonPublic | BindingFlags.Static);
-            var funsion = typeof(AppDomain).GetMethod("GetFusionContext", BindingFlags.NonPublic | BindingFlags.Instance);
-            m.Invoke(null, new object[] { funsion.Invoke(AppDomain.CurrentDomain, null), "PRIVATE_BINPATH", path });
+            //var m = typeof(AppDomainSetup).GetMethod("UpdateContextProperty", BindingFlags.NonPublic | BindingFlags.Static);
+            //var funsion = typeof(AppDomain).GetMethod("GetFusionContext", BindingFlags.NonPublic | BindingFlags.Instance);
+            //m.Invoke(null, new object[] { funsion.Invoke(AppDomain.CurrentDomain, null), "PRIVATE_BINPATH", path });
         }
     }
 }

@@ -4440,16 +4440,21 @@ ORDER BY ASN.AsnCode ASC");
             generator = new SqlServerSqlGenerator { AutoQuota = false };
             generator.Generate(select, new PagingInfo(3, 10));
             var pagingSql = generator.Sql;
+//            Assert.IsTrue(pagingSql.ToString() ==
+//@"SELECT TOP 10 *
+//FROM ASN
+//WHERE ASN.Id > {0} AND ASN.Id NOT IN (
+//    SELECT TOP 20 ASN.Id
+//    FROM ASN
+//    WHERE ASN.Id > {1}
+//    ORDER BY ASN.AsnCode ASC
+//)
+//ORDER BY ASN.AsnCode ASC");
             Assert.IsTrue(pagingSql.ToString() ==
-@"SELECT TOP 10 *
+@"SELECT * FROM
+(SELECT *, ROW_NUMBER() OVER (ORDER BY ASN.AsnCode ASC) _RowNumber 
 FROM ASN
-WHERE ASN.Id > {0} AND ASN.Id NOT IN (
-    SELECT TOP 20 ASN.Id
-    FROM ASN
-    WHERE ASN.Id > {1}
-    ORDER BY ASN.AsnCode ASC
-)
-ORDER BY ASN.AsnCode ASC");
+WHERE ASN.Id > {0})T WHERE _RowNumber BETWEEN 21 AND 30");
         }
 
         [TestMethod]
@@ -4733,6 +4738,28 @@ WHERE ""BOOK"".""CODE"" = {0}");
             var sql = generator.Sql;
             Assert.IsTrue(sql.ToString() == @"SELECT *
 FROM Book");
+        }
+
+        [TestMethod]
+        public void ORM_TableQuery_LargeInCondition()
+        {
+            List<int> ids = new List<int>();
+            for (int i = 1; i < 3001; i++)
+            {
+                ids.Add(i);
+            }
+            var repo = RepositoryFacade.ResolveInstance<BookRepository>();
+            using (RF.TransactionScope(repo))
+            {
+                var book=new Book();
+                repo.Save(book);
+                if (!ids.Contains(book.Id))
+                {
+                    ids.Add(book.Id);
+                }
+                Assert.AreEqual(repo.GetBookListByIds(ids).Count, 1,"大批量IN条件测试");
+            }
+
         }
 
         [TestMethod]
@@ -5259,16 +5286,22 @@ ORDER BY Article.Code ASC");
             generator = new SqlServerSqlGenerator { AutoQuota = false };
             generator.Generate(query as SqlSelect, new PagingInfo(3, 10));
             var pagingSql = generator.Sql;
+            //            Assert.IsTrue(pagingSql.ToString() ==
+            //@"SELECT TOP 10 *
+            //FROM Article
+            //WHERE Article.Id > {0} AND Article.Id NOT IN (
+            //    SELECT TOP 20 Article.Id
+            //    FROM Article
+            //    WHERE Article.Id > {1}
+            //    ORDER BY Article.Code ASC
+            //)
+            //ORDER BY Article.Code ASC");
+
             Assert.IsTrue(pagingSql.ToString() ==
-@"SELECT TOP 10 *
+@"SELECT * FROM
+(SELECT Article.*, ROW_NUMBER() OVER (ORDER BY Article.Code ASC) _RowNumber 
 FROM Article
-WHERE Article.Id > {0} AND Article.Id NOT IN (
-    SELECT TOP 20 Article.Id
-    FROM Article
-    WHERE Article.Id > {1}
-    ORDER BY Article.Code ASC
-)
-ORDER BY Article.Code ASC");
+WHERE Article.Id > {0})T WHERE _RowNumber BETWEEN 21 AND 30");
         }
 
         [TestMethod]
